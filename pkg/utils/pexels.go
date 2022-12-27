@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"math"
 	"strings"
 )
 
@@ -54,13 +55,17 @@ func (u *Utils) NewPexels(authorization string) *Pexels {
 //}
 
 type PexelsSearchInput struct {
-	Query       string
-	Orientation string
-	Size        string
-	Color       string
-	Locale      string
-	Page        uint
-	PerPage     uint
+	Query       string `json:"query"`
+	Orientation string `json:"orientation"`
+	Size        string `json:"size"`
+	Color       string `json:"color"`
+	Locale      string `json:"locale"`
+	Page        uint64 `json:"page"`
+	PerPage     uint64 `json:"per_page"`
+}
+
+func (p *PexelsSearchInput) String() string {
+	return fmt.Sprintf("Query: %s\nOrientation: %s\nSize: %s\nColor: %s\nLocale: %s\nPage: %d\nPerPage: %d", p.Query, p.Orientation, p.Size, p.Color, p.Locale, p.Page, p.PerPage)
 }
 
 type PhotoSource struct {
@@ -75,13 +80,13 @@ type PhotoSource struct {
 }
 
 type Photo struct {
-	ID              int         `json:"id"`
-	Width           int         `json:"width"`
-	Height          int         `json:"height"`
+	ID              int64       `json:"id"`
+	Width           int64       `json:"width"`
+	Height          int64       `json:"height"`
 	URL             string      `json:"url"`
 	Photographer    string      `json:"photographer"`
 	PhotographerURL string      `json:"photographer_url"`
-	PhotographerID  int         `json:"photographer_id"`
+	PhotographerID  int64       `json:"photographer_id"`
 	AvgColor        string      `json:"avg_color"`
 	Src             PhotoSource `json:"src"`
 	Liked           bool        `json:"liked"`
@@ -89,11 +94,13 @@ type Photo struct {
 }
 
 type PexelsSearchOutput struct {
-	Page         int     `json:"page"`
-	PerPage      int     `json:"per_page"`
-	Photos       []Photo `json:"photos"`
-	TotalResults int     `json:"total_results"`
-	NextPage     string  `json:"next_page"`
+	pexels       *Pexels
+	SearchInput  PexelsSearchInput `json:"search_input"`
+	Page         int64             `json:"page"`
+	PerPage      int64             `json:"per_page"`
+	Photos       []Photo           `json:"photos"`
+	TotalResults int64             `json:"total_results"`
+	NextPage     string            `json:"next_page"`
 }
 
 func (p *PexelsSearchOutput) String() string {
@@ -107,7 +114,35 @@ func (p *PexelsSearchOutput) String() string {
 	return retval
 }
 
-func (p *Pexels) SavePhotoByIDToDisk(searchResults PexelsSearchOutput, photoID int, targetFilePath string) (*resty.Response, error) {
+func (p *PexelsSearchOutput) GetPhotoByNumber(photoNumber int64) (*Photo, error) {
+
+	if photoNumber <= int64(len(p.Photos)) {
+		if photoNumber > 0 {
+			photoNumber--
+		}
+		for k, photo := range p.Photos {
+			if int64(k) == photoNumber {
+				return &photo, nil
+			}
+		}
+	}
+
+	if photoNumber > int64(len(p.Photos)) && photoNumber <= p.TotalResults {
+		return p.SearchPhotoByNumber(photoNumber)
+	}
+
+	return nil, errors.New(fmt.Sprintf("PexelsSearchOutput.GetPhotoByNumber::Photo Number (%d) is neither <= %d nor > %d but <= %d", photoNumber, len(p.Photos), len(p.Photos), p.TotalResults))
+}
+
+func (p *PexelsSearchOutput) SearchPhotoByNumber(photoNumber int64) (*Photo, error) {
+	if photoNumber <= p.TotalResults {
+		p.SearchInput.Page = uint64(math.Ceil(float64(uint64(photoNumber) / p.SearchInput.PerPage)))
+		return p.pexels.SearchPhotoByNumber(p.SearchInput, photoNumber)
+	}
+	return nil, errors.New(fmt.Sprintf("PexelsSearchOutput.SearchPhotoByNumber::Photo Number (%d) is > TotalResults (%d)", photoNumber, p.TotalResults))
+}
+
+func (p *Pexels) SavePhotoByIDToDisk(searchResults PexelsSearchOutput, photoID int64, targetFilePath string) (*resty.Response, error) {
 	if p.Utils.FileExists(targetFilePath) {
 		return nil, errors.New(fmt.Sprintf("Target file %s already exists", targetFilePath))
 	}
@@ -121,7 +156,25 @@ func (p *Pexels) SavePhotoByIDToDisk(searchResults PexelsSearchOutput, photoID i
 	return nil, errors.New(fmt.Sprintf("Photo with ID %d not found in search results provided", photoID))
 }
 
-func (p *Pexels) SavePhotoByNumberToDisk(searchResults PexelsSearchOutput, photoNumber int, targetFilePath string) (*resty.Response, error) {
+func (p *Pexels) SavePhotoByNumberToDisk(searchResults PexelsSearchOutput, photoNumber int64, targetFilePath string) (*resty.Response, error) {
+	if p.Utils.FileExists(targetFilePath) {
+		return nil, errors.New(fmt.Sprintf("Target file %s already exists", targetFilePath))
+	}
+
+	photo, photoErr := searchResults.GetPhotoByNumber(photoNumber)
+
+	if photoErr != nil {
+		return nil, photoErr
+	}
+
+	if photo != nil {
+		return p.Utils.CreateFileWithDataAtURL(photo.Src.Original, targetFilePath)
+	}
+
+	return nil, errors.New(fmt.Sprintf("Photo at sequence number %d not found in search results provided", photoNumber))
+}
+
+func (p *Pexels) GetPhotoURLToDownload(searchResults PexelsSearchOutput, photoNumber int, targetFilePath string) (*resty.Response, error) {
 	if p.Utils.FileExists(targetFilePath) {
 		return nil, errors.New(fmt.Sprintf("Target file %s already exists", targetFilePath))
 	}
@@ -139,9 +192,13 @@ func (p *Pexels) Search(input PexelsSearchInput) PexelsSearchOutput {
 
 	var output PexelsSearchOutput
 
+	output.pexels = p
+
 	if input.PerPage > 80 {
 		input.PerPage = 80
 	}
+
+	output.SearchInput = input
 
 	client := resty.New()
 	resp, respErr := client.R().
@@ -175,4 +232,55 @@ func (p *Pexels) Search(input PexelsSearchInput) PexelsSearchOutput {
 	}
 
 	return output
+}
+
+func (p *Pexels) SearchPhotoByNumber(input PexelsSearchInput, photoNumber int64) (*Photo, error) {
+	input.Page = uint64(math.Ceil(float64(uint64(photoNumber) / input.PerPage)))
+	searchResults := p.Search(input)
+	photoNumberInResultsPage := uint64(photoNumber) - (input.PerPage * input.Page)
+
+	for keyPhotoNumber, photo := range searchResults.Photos {
+		if uint64(keyPhotoNumber) == photoNumberInResultsPage {
+			return &photo, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("Pexels.SearchPhotoByNumber::Could not find photo number #%d (#%d in results page #%d) using input:\n %s", photoNumber, photoNumberInResultsPage, input.Page, input.String()))
+}
+
+func (p *Photo) Download(sourceFileURL, targetFilePath string) (*resty.Response, error) {
+	client := resty.New()
+	return client.R().SetOutput(targetFilePath).Get(sourceFileURL)
+}
+
+func (p *Photo) DownloadTiny(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Tiny, targetFilePath)
+}
+
+func (p *Photo) DownloadSmall(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Small, targetFilePath)
+}
+
+func (p *Photo) DownloadMedium(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Medium, targetFilePath)
+}
+
+func (p *Photo) DownloadLarge(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Large, targetFilePath)
+}
+
+func (p *Photo) DownloadLarge2X(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Large2X, targetFilePath)
+}
+
+func (p *Photo) DownloadOriginal(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Original, targetFilePath)
+}
+
+func (p *Photo) DownloadLandscape(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Landscape, targetFilePath)
+}
+
+func (p *Photo) DownloadPortrait(targetFilePath string) (*resty.Response, error) {
+	return p.Download(p.Src.Portrait, targetFilePath)
 }

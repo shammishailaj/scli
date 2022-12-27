@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -22,9 +23,9 @@ func (u *Utils) FileExists(path string) bool {
 	return true
 }
 
-func (u *Utils) DeleteFileByAge(path string, minAgeForDeletion int64) (bool,error) {
+func (u *Utils) DeleteFileByAge(path string, minAgeForDeletion int64) (bool, error) {
 	u.Log.Infof("Deleting file: %s", path)
-	/*fileStat*/_, fileStatErr := os.Stat(path)
+	/*fileStat*/ _, fileStatErr := os.Stat(path)
 	if os.IsNotExist(fileStatErr) {
 		u.Log.Errorf("Could not find file %s. %s", path, fileStatErr.Error())
 		return false, fileStatErr
@@ -68,8 +69,7 @@ func (u *Utils) DeleteFileByAge(path string, minAgeForDeletion int64) (bool,erro
 	}
 }
 
-
-func (u *Utils) GetFileList( directoryPath string ) map[int]string {
+func (u *Utils) GetFileList(directoryPath string) map[int]string {
 	filesList := make(map[int]string)
 	filesListIterator := 0
 
@@ -105,7 +105,7 @@ func (u *Utils) GetFileList( directoryPath string ) map[int]string {
 	return filesList
 }
 
-func (u *Utils) GetFileListGlob( pattern string ) map[int]string {
+func (u *Utils) GetFileListGlob(pattern string) map[int]string {
 	filesList := make(map[int]string)
 	filesListIterator := 0
 
@@ -149,7 +149,7 @@ func (u *Utils) GetFileListGlob( pattern string ) map[int]string {
 	return filesList
 }
 
-func (u *Utils) DeleteFileList( fileExtToClean, directoryPath string ) int {
+func (u *Utils) DeleteFileList(fileExtToClean, directoryPath string) int {
 	deletionCount := 0
 	if fileExtToClean == "" {
 		fileExtToClean = "pdf"
@@ -160,8 +160,8 @@ func (u *Utils) DeleteFileList( fileExtToClean, directoryPath string ) int {
 	if directoryPath == "" {
 		u.Log.Errorf("Must specify Directory Path where files need to deleted")
 	} else {
-		if u.FileExists( directoryPath ) {
-			filesList := u.GetFileList(fmt.Sprintf("%s/%s", directoryPath, fileExtToClean) )
+		if u.FileExists(directoryPath) {
+			filesList := u.GetFileList(fmt.Sprintf("%s/%s", directoryPath, fileExtToClean))
 			filesListLen := len(filesList)
 			if filesListLen > 0 {
 				for _, filePath := range filesList {
@@ -186,7 +186,6 @@ func (u *Utils) DeleteFileList( fileExtToClean, directoryPath string ) int {
 	return deletionCount
 }
 
-
 func (u *Utils) DeleteFileListE(prefix, fileExtToClean, directoryPath string, maxAge int64, forceNoExt bool) int {
 	deletionCount := 0
 	cpuCores := u.CPUCores()
@@ -207,7 +206,7 @@ func (u *Utils) DeleteFileListE(prefix, fileExtToClean, directoryPath string, ma
 	if directoryPath == "" {
 		u.Log.Errorf("Must specify Directory Path where files need to deleted")
 	} else {
-		if u.FileExists( directoryPath ) {
+		if u.FileExists(directoryPath) {
 			filesList := u.GetFileListGlob(fmt.Sprintf("%s/%s", directoryPath, fileExtToClean))
 			filesListLen := len(filesList)
 			u.Log.Infof("Found %d files", filesListLen)
@@ -247,3 +246,9 @@ func (u *Utils) DeleteFileListE(prefix, fileExtToClean, directoryPath string, ma
 	return deletionCount
 }
 
+func (u *Utils) CreateFileWithDataAtURL(sourceFileURL string, targetFilePath string) (*resty.Response, error) {
+	u.Log.Infof("Downloading file: %s", sourceFileURL)
+	client := resty.New()
+	client = client.SetLogger(u.Log)
+	return client.R().SetOutput(targetFilePath).Get(sourceFileURL)
+}
