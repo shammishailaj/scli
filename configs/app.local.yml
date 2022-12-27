@@ -1,0 +1,5 @@
+host: 0.0.0.0
+port: 9999
+app_name: scli
+app_desc: "SCLI"
+theme: default

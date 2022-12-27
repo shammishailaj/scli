@@ -1,0 +1,85 @@
+version: "3.7"
+
+services:
+  scli:
+    container_name: scli
+    image: scli
+    build:
+      context: ..
+      dockerfile: ./deployments/Dockerfile
+      args:
+        - OS=${GOOS}
+        - CGO=${CGO_ENABLED}
+        - ARCH=${GOARCH}
+    environment:
+      - APP_ENV=local
+    stop_signal: SIGINT
+    volumes:
+      - ./web:/scli/web
+    ports:
+      - 9999:9999
+    networks:
+      - scli-net
+
+  scli-dev:
+    container_name: scli_dev
+    image: scli_dev
+    build:
+      context: ..
+      dockerfile: ./deployments/Dockerfile
+      args:
+        - OS=${GOOS}
+        - CGO=${CGO_ENABLED}
+        - ARCH=${GOARCH}
+    entrypoint: /scli/scli serve
+    environment:
+      - APP_ENV=
+    stop_signal: SIGINT
+    volumes:
+      - ./../web:/scli/web
+    ports:
+      - 9999:9999
+    networks:
+      - scli-net
+
+  scli-cli:
+    image: scli_cli
+    container_name: scli_cli
+    build:
+      context: ..
+      dockerfile: ./deployments/Dockerfile
+      args:
+        - OS=${GOOS}
+        - CGO=${CGO_ENABLED}
+        - ARCH=${GOARCH}
+      target: builder
+    environment:
+      - APP_ENV=local
+    stop_signal: SIGINT
+    volumes:
+      - ./..:/go/src/scli
+    ports:
+      - 9999:9999
+    networks:
+      - scli-net
+
+
+  tests:
+    build:
+      context: ..
+      dockerfile: ./deploy/Dockerfile
+    working_dir: /var/www/scli
+    command: go test -v ./...
+    volumes:
+      - ./..:/var/www/scli
+
+  linter:
+    image: golangci/golangci-lint:latest
+    working_dir: /app
+    command: golangci-lint run -v
+    volumes:
+      - ./..:/app
+
+networks:
+  scli-net:
+    driver: bridge
