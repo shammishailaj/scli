@@ -1,9 +1,8 @@
-# scli
+# SCLI
 
 ---
 
-scli
-SCLI
+SCLI is a collection of CLI commands to automate daily repetitive tasks.
 
 The boilerplate for this project has been generated using [goboiler](https://github.com/shammishailaj/goboiler) which is a fork of [go-wagen](https://github.com/groovili/go-wagen).
 
@@ -50,10 +49,11 @@ The default app can be run/built using the following `make` targets.
 
 ---
 
-`run` - Builds and runs the default app using the `docker` image `shammishailaj/gobuilder:0.0.3`
+`run` - Builds and runs the default app using the `docker` image [`shammishailaj/gobuilder:0.0.6`](https://hub.docker.com/repository/docker/shammishailaj/gobuilder)
 
-`build` - Builds the project using the `docker` image `shammishailaj/gobuilder:0.0.3` first and then copies all the required project files into a `scratch` image. The resultant is a docker image and not an executable.
+`build` - Builds the project using the `docker` image [`shammishailaj/gobuilder:0.0.6`](https://hub.docker.com/repository/docker/shammishailaj/gobuilder) first and then copies all the required project files into a `scratch` image. The resultant is a docker image and not an executable.
 
+`cli` - Builds the executable which is extracted to the `bin/` directory. cli parameters `os=&lt;os-name&gt; arch=&lt;arch-name&gt;`. The accepted values can be seen by `go tool dist list` 
 
 
 #### D. Included Applications
@@ -63,16 +63,18 @@ The default app can be run/built using the following `make` targets.
 - scli CLI and Web server
 
 
-#### How to run
+#### How to run Webserver
 
 ```
-go mod init scli
-go mod tidy
-go mod vendor
-git init
-git add .gitignore
-git commit -m"Initial commit #1 Ignoring files"
-git add .
-git commit -m"Initial commit #2 Adding everything"
+git clone https://github.com/shammishailaj/scli.git
 make run
+```
+
+#### How to build cli
+
+Also read the details for `cli` in Section C.
+
+```
+git clone https://github.com/shammishailaj/scli.git
+make cli
 ```
