@@ -17,6 +17,7 @@ const (
 	PEXELS_ORIENTATION_LANDSCAPE = "landscape"
 	PEXELS_ORIENTATION_PORTRAIT  = "portrait"
 	PEXELS_ORIENTATION_SQUARE    = "square"
+	PEXELS_LOCALE_DEFAULT        = "en-US"
 )
 
 var (
@@ -43,6 +44,7 @@ func (u *Utils) NewPexels(authorization string) *Pexels {
 //	resp, respErr := client.R().
 //		SetHeader("Authorization", p.Authorization).
 //		SetHeader("User-Agent", "SCLI/0.0.1").
+
 //		SetBody(fmt.Sprintf("{\"username\":\"%s\", \"password\":\"%s\"}", c.Configs[clusterID].UserName, c.Configs[clusterID].Password)).
 //		//SetResult(&respData).
 //		Post(loginURL)

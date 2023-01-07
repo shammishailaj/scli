@@ -19,17 +19,17 @@ import (
 )
 
 // cleanCmd represents the cleanCmd command
-var modifyCmd = &cobra.Command{
-	Use:   "modify",
-	Short: "A wrapper for all modify subcommands",
-	Long:  `A wrapper for all modify subcommands`,
+var randomCmd = &cobra.Command{
+	Use:   "random",
+	Short: "A wrapper for all random subcommands",
+	Long:  `A wrapper for all random subcommands`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Use `modify help` for help")
+		fmt.Println("Use `random help` for help")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(modifyCmd)
+	rootCmd.AddCommand(randomCmd)
 
 	// Here you will define your flags and configuration settings.
 

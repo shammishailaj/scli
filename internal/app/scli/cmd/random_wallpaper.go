@@ -1,0 +1,98 @@
+/*
+Copyright © 2022  <>
+
+Licensed under the HLT License, Version 0.0.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+package cmd
+
+import (
+	"github.com/spf13/cobra"
+)
+
+// cleanCmd represents the cleanCmd command
+var randomWallpaperCmd = &cobra.Command{
+	Use:   "wallpaper",
+	Short: "Set random wallpaper",
+	Long:  `Set random wallpaper`,
+	Run: func(cmd *cobra.Command, args []string) {
+		u.Log.Infof("Setting random wallpaper....")
+
+		authorization, authorizationErr := cmd.Flags().GetString("authorization")
+		if authorizationErr != nil {
+			u.Log.Fatalf("Can not proceed without a valid api key. %s\n", authorizationErr.Error())
+		}
+
+		if len(authorization) < 32 {
+			u.Log.Fatalf("Can not proceed without a valid api key....\n")
+		}
+
+		query, queryErr := cmd.Flags().GetString("query")
+		if queryErr != nil {
+			u.Log.Fatalf("Can not proceed without a valid search query. %s", queryErr.Error())
+		}
+
+		if len(query) < 1 {
+			u.Log.Fatalf("Can not proceed without a valid search query. Empty string passed")
+		}
+
+		orientation, orientationErr := cmd.Flags().GetString("orientation")
+		if orientationErr != nil {
+			u.Log.Infof("Error reading value for orientation. %s. Will use: landscape", orientationErr.Error())
+		}
+
+		size, sizeErr := cmd.Flags().GetString("size")
+		if sizeErr != nil {
+			u.Log.Infof("Error reading value for size. %s. Will use: large", sizeErr.Error())
+		}
+
+		color, colorErr := cmd.Flags().GetString("color")
+		if colorErr != nil {
+			u.Log.Errorf("Error parsing value for color. %s. Will not send a color in request", colorErr.Error())
+			color = ""
+		}
+
+		locale, localeErr := cmd.Flags().GetString("locale")
+		if localeErr != nil {
+			u.Log.Infof("Error parsing value for locale. %s. Will not send a locale in request", localeErr.Error())
+			locale = ""
+		}
+
+		randomWallpaperErr := u.RandomPexelsWallpaper(authorization, query, orientation, size, color, locale)
+		if randomWallpaperErr != nil {
+			u.Log.Fatalf("Error setting random wallpaper. %s\n", randomWallpaperErr.Error())
+		}
+
+		u.Log.Infof("Wallpaper changed successfully...\n")
+	},
+}
+
+func init() {
+	randomCmd.AddCommand(randomWallpaperCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// randomWallpaperCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// randomWallpaperCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	randomWallpaperCmd.Flags().StringP("authorization", "a", "", "Pexels API Key used in Authorization request header")
+	randomWallpaperCmd.Flags().StringP("query", "q", "beautiful", "Query to search for")
+	randomWallpaperCmd.Flags().StringP("orientation", "o", "landscape", "(Optional) Desired photo orientation. The current supported orientations are: landscape, portrait or square")
+	randomWallpaperCmd.Flags().StringP("size", "s", "large", "(Optional) Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP)")
+	randomWallpaperCmd.Flags().StringP("color", "c", "", "(Optional) Desired photo color. Supported colors: red, orange, yellow, green, turquoise, blue, violet, pink, brown, black, gray, white or any hexadecimal color code (eg. #ffffff)")
+	randomWallpaperCmd.Flags().StringP("locale", "l", "", "The locale of the search you are performing. The current supported locales are: 'en-US' 'pt-BR' 'es-ES' 'ca-ES' 'de-DE' 'it-IT' 'fr-FR' 'sv-SE' 'id-ID' 'pl-PL' 'ja-JP' 'zh-TW' 'zh-CN' 'ko-KR' 'th-TH' 'nl-NL' 'hu-HU' 'vi-VN' 'cs-CZ' 'da-DK' 'fi-FI' 'uk-UA' 'el-GR' 'ro-RO' 'nb-NO' 'sk-SK' 'tr-TR' 'ru-RU'")
+	randomWallpaperCmd.Flags().Uint64P("max-results", "m", 15, "The number of results you are requesting per page. Default: 15 Max: 80")
+	randomWallpaperCmd.Flags().StringP("save-file-path", "t", "./", "Path to the file in which to save the Image. Path should exist, file should not")
+}

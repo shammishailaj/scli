@@ -252,3 +252,8 @@ func (u *Utils) CreateFileWithDataAtURL(sourceFileURL string, targetFilePath str
 	client = client.SetLogger(u.Log)
 	return client.R().SetOutput(targetFilePath).Get(sourceFileURL)
 }
+
+func (u *Utils) TempFile(fileNamePattern string) (*os.File, error) {
+	tempDir := os.TempDir()
+	return os.CreateTemp(tempDir, fileNamePattern)
+}
