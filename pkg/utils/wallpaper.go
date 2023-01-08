@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"net/url"
 	"path"
-	"path/filepath"
 	"time"
 )
 
@@ -125,9 +124,14 @@ func (u *Utils) RandomPexelsWallpaper(authorization, query, orientation, size, c
 	input.Locale = locale
 
 	pexels := u.NewPexels(authorization)
-	u.Log.Infof("Sending request to Pexels search API...")
+	u.Log.Infof("Sending request to Pexels search API with input...\n%s", input.String())
 	output := pexels.Search(input)
+	u.Log.Infof("Output Received....\n%s", output.String())
 	photoNumber := int64(1)
+
+	if output.TotalResults <= 0 {
+		return errors.New(fmt.Sprintf("Nothing found for Search Input\n%s", input.String()))
+	}
 
 	u.Log.Infof("Getting a random photo...")
 	u.Log.Infof("Generating a random photo number...")
@@ -153,16 +157,17 @@ func (u *Utils) RandomPexelsWallpaper(authorization, query, orientation, size, c
 			urlParsed = &url.URL{Path: photo.Src.Large2X}
 		}
 
-		saveFileName := fmt.Sprintf("SCLI_WALLPAPER_%d_%s_*", time.Nanosecond, path.Base(urlParsed.Path))
+		saveFileName := fmt.Sprintf("SCLI_WALLPAPER_%d_%s_*", time.Now().Nanosecond(), path.Base(urlParsed.Path))
 		saveFileHandle, saveFileHandleErr := u.TempFile(saveFileName)
 		if saveFileHandleErr != nil {
 			return errors.New(fmt.Sprintf("Error creating temporary file to save downloaded wallpaper. %s", saveFileHandleErr.Error()))
 		}
-		saveFilePath, saveFilePathErr := filepath.Abs(filepath.Dir(saveFileHandle.Name()))
-		if saveFilePathErr != nil {
-			u.Log.Errorf("Unable to get filepath of temp file created. %s", saveFilePathErr.Error())
-			saveFilePath = "Unable to get filepath of temp file created"
-		}
+		//saveFilePath, saveFilePathErr := filepath.Abs(filepath.Dir(saveFileHandle.Name()))
+		//if saveFilePathErr != nil {
+		//	u.Log.Errorf("Unable to get filepath of temp file created. %s", saveFilePathErr.Error())
+		//	saveFilePath = "Unable to get filepath of temp file created"
+		//}
+		saveFilePath := saveFileHandle.Name()
 
 		u.Log.Infof("Photo Found!. Saving as %s OR %s", saveFileHandle.Name(), saveFilePath)
 		if len(saveFilePath) >= 0 {
