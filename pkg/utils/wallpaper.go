@@ -314,13 +314,17 @@ func (u *Utils) RandomPexelsWallpaperWithCache(authorization, query, orientation
 
 		saveFileName := fmt.Sprintf("SCLI_WALLPAPER_%d_%s_*", time.Now().Nanosecond(), path.Base(urlParsed.Path))
 
+		if cacheDir != "" {
+			cacheDir += "/scli/random/wallpaper"
+		}
+
 		absCacheDir, absCacheDirErr := u.GetAbsolutePath(cacheDir)
 		if absCacheDirErr != nil {
 			return absCacheDirErr
 		}
 
 		if !u.FileExists(absCacheDir) {
-			mkdirAllErr := os.MkdirAll(cacheDir, 0644)
+			mkdirAllErr := os.MkdirAll(absCacheDir, 0644)
 			if mkdirAllErr != nil {
 				return mkdirAllErr
 			}

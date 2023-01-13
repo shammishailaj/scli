@@ -119,5 +119,5 @@ func init() {
 	randomWallpaperCmd.Flags().StringP("query", "q", "beautiful", "Query to search for")
 	randomWallpaperCmd.Flags().StringP("size", "s", "large", "(Optional) Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP)")
 	randomWallpaperCmd.Flags().StringP("save-file-path", "t", "./", "Path to the file in which to save the Image. Path should exist, file should not")
-	randomWallpaperCmd.Flags().StringP("cache-path", "u", utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR, "Path to the directory where the downloaded image files shall be cached. Default \"~/.cache/scli\". If path does not exist, it shall be created automatically. Files shall be stored inside this path inside \"random/wallpaper\" directory")
+	randomWallpaperCmd.Flags().StringP("cache-path", "u", utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR, "Path to the directory where the downloaded image files shall be cached without trailingg slashes. Default \"~/.cache\". If path does not exist, it shall be created automatically. Files shall be stored inside this path inside \"random/wallpaper\" directory")
 }
