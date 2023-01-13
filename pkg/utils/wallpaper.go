@@ -324,7 +324,7 @@ func (u *Utils) RandomPexelsWallpaperWithCache(authorization, query, orientation
 		}
 
 		if !u.FileExists(absCacheDir) {
-			mkdirAllErr := os.MkdirAll(absCacheDir, 0664)
+			mkdirAllErr := os.MkdirAll(absCacheDir, 0600)
 			if mkdirAllErr != nil {
 				return mkdirAllErr
 			}
