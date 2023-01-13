@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -256,4 +257,26 @@ func (u *Utils) CreateFileWithDataAtURL(sourceFileURL string, targetFilePath str
 func (u *Utils) TempFile(fileNamePattern string) (*os.File, error) {
 	tempDir := os.TempDir()
 	return os.CreateTemp(tempDir, fileNamePattern)
+}
+
+func (u *Utils) TempFileAtDir(tempDir, fileNamePattern string) (*os.File, error) {
+	return os.CreateTemp(tempDir, fileNamePattern)
+}
+
+func (u *Utils) GetAbsolutePath(path string) (string, error) {
+	absPath := ""
+	if strings.HasPrefix(path, "~") {
+		usr, usrErr := user.Current()
+		if usrErr != nil {
+			return absPath, usrErr
+		}
+		absPath += usr.HomeDir
+
+		if strings.HasPrefix(path, "~/") {
+			absPath = filepath.Join(absPath, path[2:])
+		}
+
+		return absPath, nil
+	}
+	return filepath.Abs(path)
 }

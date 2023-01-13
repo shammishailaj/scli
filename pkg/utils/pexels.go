@@ -103,6 +103,8 @@ type PexelsSearchOutput struct {
 	Photos       []Photo           `json:"photos"`
 	TotalResults int64             `json:"total_results"`
 	NextPage     string            `json:"next_page"`
+	Errors       []error           `json:"errors"`
+	Error        string            `json:"error"`
 }
 
 func (p *PexelsSearchOutput) String() string {
@@ -112,7 +114,10 @@ func (p *PexelsSearchOutput) String() string {
 		retval += fmt.Sprintf("Photo #%d\n----------\nID: %d\nWidth: %d\nHeight: %d\nURL: %s\nPhotographer: %s\nPhotographerURL: %s\nPhotographerID: %d\nAvgColor: %s\nSrc.Original: %s\nSrc.Large2X: %s\nSrc.Large: %s\nSrc.Medium: %s\nSrc.Small: %s\nSrc.Portrait: %s\nSrc.Landscape: %s,Src.Tiny: %s\nLiked: %t\nAlt: %s\n",
 			k+1, photo.ID, photo.Width, photo.Height, photo.URL, photo.Photographer, photo.PhotographerURL, photo.PhotographerID, photo.AvgColor, photo.Src.Original, photo.Src.Large2X, photo.Src.Large, photo.Src.Medium, photo.Src.Small, photo.Src.Portrait, photo.Src.Landscape, photo.Src.Tiny, photo.Liked, photo.Alt)
 	}
-	retval += fmt.Sprintf("TotalResults: %d\nNextPage: %s\n", p.TotalResults, p.NextPage)
+	retval += fmt.Sprintf("TotalResults: %d\nNextPage: %s\nErrors \n----------", p.TotalResults, p.NextPage)
+	for k, err := range p.Errors {
+		retval += fmt.Sprintf("\nError Text #%d: %s\n", k, err.Error())
+	}
 	return retval
 }
 
@@ -218,6 +223,12 @@ func (p *Pexels) Search(input PexelsSearchInput) PexelsSearchOutput {
 	if respErr != nil {
 		p.Utils.Log.Errorf("Error fetching data from pexels API via go-resty. %s", respErr.Error())
 		return output
+	}
+
+	respCode := resp.StatusCode()
+
+	if respCode > 299 || respCode < 200 {
+		output.Errors = append(output.Errors, errors.New(fmt.Sprintf("Response Status Code: %d, Response Status: %s", respCode, resp.String())))
 	}
 
 	headers := resp.Header()

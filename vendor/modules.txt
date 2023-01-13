@@ -363,6 +363,9 @@ github.com/spf13/viper/internal/encoding/yaml
 # github.com/subosito/gotenv v1.4.1
 ## explicit; go 1.18
 github.com/subosito/gotenv
+# github.com/syyongx/php2go v0.9.8
+## explicit; go 1.12
+github.com/syyongx/php2go
 # github.com/tdewolff/minify/v2 v2.12.4
 ## explicit; go 1.13
 github.com/tdewolff/minify/v2

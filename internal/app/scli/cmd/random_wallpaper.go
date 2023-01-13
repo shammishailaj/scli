@@ -14,6 +14,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/shammishailaj/scli/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -65,7 +66,23 @@ var randomWallpaperCmd = &cobra.Command{
 			locale = ""
 		}
 
-		randomWallpaperErr := u.RandomPexelsWallpaper(authorization, query, orientation, size, color, locale)
+		dbusSessionBusAddress, dbusSessionBusAddressErr := cmd.Flags().GetString("dbus-session-bus-address")
+		if dbusSessionBusAddressErr != nil {
+			u.Log.Fatalf("Can not continue without valid value for parameter --dbus-session-bus-address. %s", dbusSessionBusAddressErr.Error())
+		}
+
+		if dbusSessionBusAddress == "" {
+			u.Log.Fatalf("Can not continue with empty value for parameter --dbus-session-bus-address")
+		}
+
+		cachePath, cachePathErr := cmd.Flags().GetString("cache-path")
+		if cachePathErr != nil {
+			u.Log.Infof("Cache directory not provided. Will use default %s", utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR)
+			cachePath = utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR
+		}
+
+		//randomWallpaperErr := u.RandomPexelsWallpaper(authorization, query, orientation, size, color, locale)
+		randomWallpaperErr := u.RandomPexelsWallpaperWithCache(authorization, query, orientation, size, color, locale, cachePath)
 		if randomWallpaperErr != nil {
 			u.Log.Fatalf("Error setting random wallpaper. %s\n", randomWallpaperErr.Error())
 		}
@@ -88,11 +105,13 @@ func init() {
 	// randomWallpaperCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	randomWallpaperCmd.Flags().StringP("authorization", "a", "", "Pexels API Key used in Authorization request header")
-	randomWallpaperCmd.Flags().StringP("query", "q", "beautiful", "Query to search for")
-	randomWallpaperCmd.Flags().StringP("orientation", "o", "landscape", "(Optional) Desired photo orientation. The current supported orientations are: landscape, portrait or square")
-	randomWallpaperCmd.Flags().StringP("size", "s", "large", "(Optional) Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP)")
 	randomWallpaperCmd.Flags().StringP("color", "c", "", "(Optional) Desired photo color. Supported colors: red, orange, yellow, green, turquoise, blue, violet, pink, brown, black, gray, white or any hexadecimal color code (eg. #ffffff)")
+	randomWallpaperCmd.Flags().StringP("dbus-session-bus-address", "d", "", "Value of the gnome variable \"DBUS_SESSION_BUS_ADDRESS\" from your shell. Do an \"echo $DBUS_SESSION_BUS_ADDRESS\" to see its value. On my system (Ubuntu 22.04.1 LTS with Gnome) it was \"unix:path=/run/user/1000/bus\"")
 	randomWallpaperCmd.Flags().StringP("locale", "l", "", "The locale of the search you are performing. The current supported locales are: 'en-US' 'pt-BR' 'es-ES' 'ca-ES' 'de-DE' 'it-IT' 'fr-FR' 'sv-SE' 'id-ID' 'pl-PL' 'ja-JP' 'zh-TW' 'zh-CN' 'ko-KR' 'th-TH' 'nl-NL' 'hu-HU' 'vi-VN' 'cs-CZ' 'da-DK' 'fi-FI' 'uk-UA' 'el-GR' 'ro-RO' 'nb-NO' 'sk-SK' 'tr-TR' 'ru-RU'")
 	randomWallpaperCmd.Flags().Uint64P("max-results", "m", 15, "The number of results you are requesting per page. Default: 15 Max: 80")
+	randomWallpaperCmd.Flags().StringP("orientation", "o", "landscape", "(Optional) Desired photo orientation. The current supported orientations are: landscape, portrait or square")
+	randomWallpaperCmd.Flags().StringP("query", "q", "beautiful", "Query to search for")
+	randomWallpaperCmd.Flags().StringP("size", "s", "large", "(Optional) Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP)")
 	randomWallpaperCmd.Flags().StringP("save-file-path", "t", "./", "Path to the file in which to save the Image. Path should exist, file should not")
+	randomWallpaperCmd.Flags().StringP("cache-path", "u", utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR, "Path to the directory where the downloaded image files shall be cached. Default \"~/.cache/scli\". If path does not exist, it shall be created automatically. Files shall be stored inside this path inside \"random/wallpaper\" directory")
 }
