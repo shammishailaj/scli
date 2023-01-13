@@ -16,6 +16,7 @@ package cmd
 import (
 	"github.com/shammishailaj/scli/pkg/utils"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // cleanCmd represents the cleanCmd command
@@ -73,6 +74,11 @@ var randomWallpaperCmd = &cobra.Command{
 
 		if dbusSessionBusAddress == "" {
 			u.Log.Fatalf("Can not continue with empty value for parameter --dbus-session-bus-address")
+		}
+
+		dbusSessionBusAddressSetErr := os.Setenv("DBUS_SESSION_BUS_ADDRESS", dbusSessionBusAddress)
+		if dbusSessionBusAddressSetErr != nil {
+			u.Log.Fatalf("Error setting DBUS_SESSION_BUS_ADDRESS environment variable. Can not continue without it")
 		}
 
 		cachePath, cachePathErr := cmd.Flags().GetString("cache-path")
