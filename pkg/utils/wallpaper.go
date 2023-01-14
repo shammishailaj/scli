@@ -312,8 +312,7 @@ func (u *Utils) RandomPexelsWallpaperWithCache(authorization, query, orientation
 			urlParsed = &url.URL{Path: photo.Src.Large2X}
 		}
 
-		saveFileName := fmt.Sprintf("SCLI_WALLPAPER_%d_%s_*", time.Now().Nanosecond(), path.Base(urlParsed.Path))
-		saveFileNameExtension := path.Ext(urlParsed.Path)
+		saveFileName := fmt.Sprintf("SCLI_WALLPAPER_%d_%s_*.%s", time.Now().Nanosecond(), path.Base(urlParsed.Path), path.Ext(urlParsed.Path))
 
 		if cacheDir != "" {
 			cacheDir += "/scli/random/wallpaper"
@@ -341,7 +340,7 @@ func (u *Utils) RandomPexelsWallpaperWithCache(authorization, query, orientation
 		//	u.Log.Errorf("Unable to get filepath of temp file created. %s", saveFilePathErr.Error())
 		//	saveFilePath = "Unable to get filepath of temp file created"
 		//}
-		saveFilePath := saveFileHandle.Name() + saveFileNameExtension
+		saveFilePath := saveFileHandle.Name()
 
 		u.Log.Infof("Photo Found!. Saving as %s OR %s", saveFileHandle.Name(), saveFilePath)
 		if len(saveFilePath) >= 0 {
