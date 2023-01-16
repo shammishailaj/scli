@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/shammishailaj/scli/pkg/utils/storage"
 	"math"
 	"strings"
 )
@@ -296,4 +298,60 @@ func (p *Photo) DownloadLandscape(targetFilePath string) (*resty.Response, error
 
 func (p *Photo) DownloadPortrait(targetFilePath string) (*resty.Response, error) {
 	return p.Download(p.Src.Portrait, targetFilePath)
+}
+
+func (p *Photo) SaveMetaDataToGenjiDB(dbPath, tableName, fileStoredAt, variantSaved, pexelsQuery string) error {
+
+	store, storageErr := storage.NewStore(map[string]string{"type": "genji"})
+	if storageErr != nil {
+		return storageErr
+	}
+	dbErr := store.Connect(dbPath, context.Background())
+	if dbErr != nil {
+		return dbErr
+	}
+
+	tableDef := `
+		id INT NOT NULL,
+		width INT NOT NULL,
+		height INT NOT NULL,
+		url TEXT NOT NULL,
+		photographer TEXT,
+		photographer_url TEXT,
+		photographerID INT,
+		avg_color TEXT,
+		src (
+			original TEXT,
+			large2x TEXT,
+			large TEXT,
+			medium TEXT,
+			small TEXT,
+			portrait TEXT,
+			landscape TEXT,
+			tiny TEXT
+		),
+		liked BOOL,
+		alt TEXT,
+		file_path TEXT,
+		saved_variant TEXT,
+		query TEXT,
+		PRIMARY KEY(id,url)
+		`
+
+	_, err := store.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s(%s)", tableName, tableDef))
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("INSERT INTO %s(id, width, height, url, photographer, photographer_url, photographer_id, avg_color, src, liked, alt, file_path, saved_variant, query) VALUES(", tableName)
+	query += fmt.Sprintf("%d,%d,%d,'%s','%s', '%s', %d, '%s',", p.ID, p.Width, p.Height, p.URL, p.Photographer, p.PhotographerURL, p.PhotographerID, p.AvgColor)
+	query += fmt.Sprintf("{\"original\":'%s',\"large2x\":'%s',\"large\":'%s',\"medium\":'%s',\"small\":'%s',\"portrait\":'%s',\"landscape\":'%s',\"tiny\":'%s'}", p.Src.Original, p.Src.Large2X, p.Src.Large, p.Src.Medium, p.Src.Small, p.Src.Portrait, p.Src.Landscape, p.Src.Tiny)
+	query += fmt.Sprintf("%t,'%s', '%s','%s','%s')", p.Liked, p.Alt, fileStoredAt, variantSaved, pexelsQuery)
+
+	_, err = store.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -87,8 +87,14 @@ var randomWallpaperCmd = &cobra.Command{
 			cachePath = utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR
 		}
 
+		dbFilePath, dbFilePathErr := cmd.Flags().GetString("db-file")
+		if dbFilePathErr != nil {
+			u.Log.Fatalf("DB directory not provided. Can not continue.\n")
+		}
+
 		//randomWallpaperErr := u.RandomPexelsWallpaper(authorization, query, orientation, size, color, locale)
-		randomWallpaperErr := u.RandomPexelsWallpaperWithCache(authorization, query, orientation, size, color, locale, cachePath)
+		//randomWallpaperErr := u.RandomPexelsWallpaperWithCache(authorization, query, orientation, size, color, locale, cachePath)
+		randomWallpaperErr := u.RandomPexelsWallpaperWithCacheAndDB(authorization, query, orientation, size, color, locale, cachePath, dbFilePath)
 		if randomWallpaperErr != nil {
 			u.Log.Fatalf("Error setting random wallpaper. %s\n", randomWallpaperErr.Error())
 		}
@@ -120,4 +126,5 @@ func init() {
 	randomWallpaperCmd.Flags().StringP("size", "s", "large", "(Optional) Minimum photo size. The current supported sizes are: large(24MP), medium(12MP) or small(4MP)")
 	randomWallpaperCmd.Flags().StringP("save-file-path", "t", "./", "Path to the file in which to save the Image. Path should exist, file should not")
 	randomWallpaperCmd.Flags().StringP("cache-path", "u", utils.RANDOM_WALLPAPER_DEFAULT_CACHE_DIR, "Path to the directory where the downloaded image files shall be cached without trailing slashes. Default \"~/.cache\". If path does not exist, it shall be created automatically. Files shall be stored inside this path inside \"random/wallpaper\" directory")
+	randomWallpaperCmd.Flags().StringP("db-file", "w", "", "Path to the GenjiDB file where the metabadate for the downloaded image files along with wallpaper change logs shall be stored")
 }

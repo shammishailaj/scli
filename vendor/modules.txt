@@ -1,3 +1,9 @@
+# github.com/DataDog/zstd v1.4.5
+## explicit
+github.com/DataDog/zstd
+# github.com/HdrHistogram/hdrhistogram-go v1.1.2
+## explicit; go 1.14
+github.com/HdrHistogram/hdrhistogram-go
 # github.com/Microsoft/go-winio v0.6.0
 ## explicit; go 1.17
 github.com/Microsoft/go-winio
@@ -32,6 +38,12 @@ github.com/aead/chacha20/chacha
 # github.com/blang/semver v3.5.1+incompatible
 ## explicit
 github.com/blang/semver
+# github.com/buger/jsonparser v1.1.1
+## explicit; go 1.13
+github.com/buger/jsonparser
+# github.com/cespare/xxhash v1.1.0
+## explicit
+github.com/cespare/xxhash
 # github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
@@ -52,15 +64,93 @@ github.com/cloudflare/circl/math/mlsbset
 github.com/cloudflare/circl/sign
 github.com/cloudflare/circl/sign/ed25519
 github.com/cloudflare/circl/sign/ed448
+# github.com/cockroachdb/errors v1.9.0
+## explicit; go 1.13
+github.com/cockroachdb/errors
+github.com/cockroachdb/errors/assert
+github.com/cockroachdb/errors/barriers
+github.com/cockroachdb/errors/contexttags
+github.com/cockroachdb/errors/domains
+github.com/cockroachdb/errors/errbase
+github.com/cockroachdb/errors/errorspb
+github.com/cockroachdb/errors/errutil
+github.com/cockroachdb/errors/hintdetail
+github.com/cockroachdb/errors/issuelink
+github.com/cockroachdb/errors/markers
+github.com/cockroachdb/errors/oserror
+github.com/cockroachdb/errors/report
+github.com/cockroachdb/errors/safedetails
+github.com/cockroachdb/errors/secondary
+github.com/cockroachdb/errors/stdstrings
+github.com/cockroachdb/errors/telemetrykeys
+github.com/cockroachdb/errors/withstack
+# github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f
+## explicit; go 1.16
+github.com/cockroachdb/logtags
+# github.com/cockroachdb/pebble v0.0.0-20220708173837-d3484a60444e
+## explicit; go 1.13
+github.com/cockroachdb/pebble
+github.com/cockroachdb/pebble/internal/arenaskl
+github.com/cockroachdb/pebble/internal/base
+github.com/cockroachdb/pebble/internal/batchskl
+github.com/cockroachdb/pebble/internal/bytealloc
+github.com/cockroachdb/pebble/internal/cache
+github.com/cockroachdb/pebble/internal/crc
+github.com/cockroachdb/pebble/internal/fastrand
+github.com/cockroachdb/pebble/internal/humanize
+github.com/cockroachdb/pebble/internal/intern
+github.com/cockroachdb/pebble/internal/invariants
+github.com/cockroachdb/pebble/internal/keyspan
+github.com/cockroachdb/pebble/internal/manifest
+github.com/cockroachdb/pebble/internal/manual
+github.com/cockroachdb/pebble/internal/private
+github.com/cockroachdb/pebble/internal/rangedel
+github.com/cockroachdb/pebble/internal/rangekey
+github.com/cockroachdb/pebble/internal/rate
+github.com/cockroachdb/pebble/internal/rawalloc
+github.com/cockroachdb/pebble/record
+github.com/cockroachdb/pebble/sstable
+github.com/cockroachdb/pebble/vfs
+github.com/cockroachdb/pebble/vfs/atomicfs
+# github.com/cockroachdb/redact v1.1.3
+## explicit; go 1.14
+github.com/cockroachdb/redact
+github.com/cockroachdb/redact/builder
+github.com/cockroachdb/redact/interfaces
+github.com/cockroachdb/redact/internal/buffer
+github.com/cockroachdb/redact/internal/escape
+github.com/cockroachdb/redact/internal/fmtforward
+github.com/cockroachdb/redact/internal/markers
+github.com/cockroachdb/redact/internal/redact
+github.com/cockroachdb/redact/internal/rfmt
+github.com/cockroachdb/redact/internal/rfmt/fmtsort
 # github.com/couchbase/gocb v1.6.7
 ## explicit
 github.com/couchbase/gocb
 # github.com/cpuguy83/go-md2man/v2 v2.0.2
 ## explicit; go 1.11
 github.com/cpuguy83/go-md2man/v2/md2man
+# github.com/dgraph-io/badger/v3 v3.2103.5
+## explicit; go 1.12
+github.com/dgraph-io/badger/v3
+github.com/dgraph-io/badger/v3/fb
+github.com/dgraph-io/badger/v3/options
+github.com/dgraph-io/badger/v3/pb
+github.com/dgraph-io/badger/v3/skl
+github.com/dgraph-io/badger/v3/table
+github.com/dgraph-io/badger/v3/trie
+github.com/dgraph-io/badger/v3/y
+# github.com/dgraph-io/ristretto v0.1.1
+## explicit; go 1.12
+github.com/dgraph-io/ristretto
+github.com/dgraph-io/ristretto/z
+github.com/dgraph-io/ristretto/z/simd
 # github.com/djherbis/times v1.5.0
 ## explicit; go 1.16
 github.com/djherbis/times
+# github.com/dustin/go-humanize v1.0.0
+## explicit
+github.com/dustin/go-humanize
 # github.com/emersion/go-imap v1.2.1
 ## explicit; go 1.13
 github.com/emersion/go-imap
@@ -82,6 +172,41 @@ github.com/emirpasic/gods/utils
 # github.com/fsnotify/fsnotify v1.6.0
 ## explicit; go 1.16
 github.com/fsnotify/fsnotify
+# github.com/genjidb/genji v0.15.1
+## explicit; go 1.18
+github.com/genjidb/genji
+github.com/genjidb/genji/document
+github.com/genjidb/genji/internal/database
+github.com/genjidb/genji/internal/database/catalogstore
+github.com/genjidb/genji/internal/database/pebble
+github.com/genjidb/genji/internal/encoding
+github.com/genjidb/genji/internal/environment
+github.com/genjidb/genji/internal/errors
+github.com/genjidb/genji/internal/expr
+github.com/genjidb/genji/internal/expr/functions
+github.com/genjidb/genji/internal/expr/glob
+github.com/genjidb/genji/internal/kv
+github.com/genjidb/genji/internal/lock
+github.com/genjidb/genji/internal/planner
+github.com/genjidb/genji/internal/query
+github.com/genjidb/genji/internal/query/statement
+github.com/genjidb/genji/internal/sql/parser
+github.com/genjidb/genji/internal/sql/scanner
+github.com/genjidb/genji/internal/stream
+github.com/genjidb/genji/internal/stream/docs
+github.com/genjidb/genji/internal/stream/index
+github.com/genjidb/genji/internal/stream/path
+github.com/genjidb/genji/internal/stream/table
+github.com/genjidb/genji/internal/stringutil
+github.com/genjidb/genji/internal/tree
+github.com/genjidb/genji/lib/atomic
+github.com/genjidb/genji/types
+# github.com/getsentry/sentry-go v0.12.0
+## explicit; go 1.15
+github.com/getsentry/sentry-go
+github.com/getsentry/sentry-go/internal/crypto/randutil
+github.com/getsentry/sentry-go/internal/debug
+github.com/getsentry/sentry-go/internal/ratelimit
 # github.com/go-chi/chi v1.5.4
 ## explicit; go 1.16
 github.com/go-chi/chi
@@ -163,11 +288,18 @@ github.com/go-sql-driver/mysql
 github.com/gofrs/uuid
 # github.com/gogo/protobuf v1.3.2
 ## explicit; go 1.15
+github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/io
 github.com/gogo/protobuf/proto
+github.com/gogo/protobuf/protoc-gen-gogo/descriptor
+github.com/gogo/protobuf/sortkeys
+github.com/gogo/protobuf/types
 # github.com/golang/glog v1.0.0
 ## explicit; go 1.11
 github.com/golang/glog
+# github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
+## explicit
+github.com/golang/groupcache/lru
 # github.com/golang/protobuf v1.5.2
 ## explicit; go 1.9
 github.com/golang/protobuf/jsonpb
@@ -181,6 +313,9 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy
+# github.com/google/flatbuffers v1.12.1
+## explicit
+github.com/google/flatbuffers/go
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
@@ -217,6 +352,18 @@ github.com/jbenet/go-context/io
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
+# github.com/klauspost/compress v1.12.3
+## explicit; go 1.13
+github.com/klauspost/compress/fse
+github.com/klauspost/compress/huff0
+github.com/klauspost/compress/zstd
+github.com/klauspost/compress/zstd/internal/xxhash
+# github.com/kr/pretty v0.3.0
+## explicit; go 1.12
+github.com/kr/pretty
+# github.com/kr/text v0.2.0
+## explicit
+github.com/kr/text
 # github.com/magiconair/properties v1.8.7
 ## explicit; go 1.19
 github.com/magiconair/properties
@@ -304,6 +451,7 @@ github.com/pulumi/pulumi/sdk/v3/python
 github.com/rivo/uniseg
 # github.com/rogpeppe/go-internal v1.9.0
 ## explicit; go 1.17
+github.com/rogpeppe/go-internal/fmtsort
 github.com/rogpeppe/go-internal/internal/syscall/windows
 github.com/rogpeppe/go-internal/internal/syscall/windows/sysdll
 github.com/rogpeppe/go-internal/lockedfile
@@ -421,6 +569,13 @@ github.com/xanzy/ssh-agent
 # github.com/yusufpapurcu/wmi v1.2.2
 ## explicit; go 1.16
 github.com/yusufpapurcu/wmi
+# go.opencensus.io v0.23.0
+## explicit; go 1.13
+go.opencensus.io
+go.opencensus.io/internal
+go.opencensus.io/trace
+go.opencensus.io/trace/internal
+go.opencensus.io/trace/tracestate
 # go.uber.org/atomic v1.10.0
 ## explicit; go 1.18
 go.uber.org/atomic
@@ -440,6 +595,9 @@ golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
 golang.org/x/crypto/ssh/terminal
+# golang.org/x/exp v0.0.0-20200513190911-00229845015e
+## explicit; go 1.12
+golang.org/x/exp/rand
 # golang.org/x/mod v0.7.0
 ## explicit; go 1.17
 golang.org/x/mod/semver
