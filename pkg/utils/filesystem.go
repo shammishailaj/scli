@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -75,7 +75,7 @@ func (u *Utils) GetFileList(directoryPath string) map[int]string {
 	filesListIterator := 0
 
 	u.Log.Infof("directoryPath = %s", directoryPath)
-	files, err := ioutil.ReadDir(directoryPath)
+	files, err := os.ReadDir(directoryPath)
 	if err != nil {
 		u.Log.Errorf("Error reading directories: %s", err.Error())
 		return filesList
@@ -279,4 +279,56 @@ func (u *Utils) GetAbsolutePath(path string) (string, error) {
 		return absPath, nil
 	}
 	return filepath.Abs(path)
+}
+
+func (u *Utils) GetFileContentType(pathToFileName string) (string, error) {
+	// Code from: https://www.tutorialspoint.com/how-to-detect-the-content-type-of-a-file-in-golang
+
+	// Open the file whose type you
+	// want to check
+	file, err := os.Open(pathToFileName)
+
+	if err != nil {
+		return "application/octet-stream", err
+	}
+
+	// to sniff the content type only the first
+	// 512 bytes are used.
+
+	buf := make([]byte, 512)
+
+	bytesRead, err := file.Read(buf)
+
+	if err != nil {
+		return "application/octet-stream", err
+	}
+
+	u.Log.Infof("Read %d bytes from %s. Closing the file now", bytesRead, pathToFileName)
+
+	fileCloseErr := file.Close()
+	if fileCloseErr != nil {
+		u.Log.Errorf("Utils.GetFileContentType()::Error closing handle for file %s. %s", pathToFileName, fileCloseErr.Error())
+	}
+
+	// the function that actually does the trick
+	contentType := http.DetectContentType(buf)
+
+	return contentType, nil
+}
+
+func (u *Utils) OverwriteFile(path string, data string) (int, error) {
+	var bytesWritten = 0
+	f, err := os.Create(path)
+	if err != nil {
+		return bytesWritten, err
+	}
+
+	bytesWritten, err = f.WriteString(data)
+
+	err = f.Close()
+	if err != nil {
+		u.Log.Errorf("Error closing file connection %s", err.Error())
+	}
+
+	return bytesWritten, err
 }
