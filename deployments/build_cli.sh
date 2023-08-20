@@ -16,7 +16,8 @@ then
 echo "Executables Directory not found. Creating..."
 mkdir ./bin
 fi
-docker container cp extractor:/bin/scli ./bin/scli-"$OS"-"$ARCH"
+VERSION=$(cat VERSION)
+docker container cp extractor:/bin/scli ./bin/scli-"$VERSION"-"$OS"-"$ARCH"
 printf "Removing container...\n"
 docker container rm -f extractor
 docker rmi -f scli_cli:latest

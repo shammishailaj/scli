@@ -598,45 +598,57 @@ func (u *Utils) SaveWallpaperChangeLog(dbPath, tableName, wallpaperPath string, 
 }
 
 func (u *Utils) RandomPexelsWallpaperFromCache(cacheDir string) error {
-	files, err := os.ReadDir(cacheDir)
+	if cacheDir != "" {
+		cacheDir += "/scli/random/wallpaper"
+	}
+
+	absCacheDir, absCacheDirErr := u.GetAbsolutePath(cacheDir)
+	if absCacheDirErr != nil {
+		return fmt.Errorf("utils.RandomPexelsWallpaperFromCache: error getting absolute path for %s: %s", cacheDir, absCacheDirErr.Error())
+	}
+
+	files, err := os.ReadDir(absCacheDir)
 	if err != nil {
-		return err
+		return fmt.Errorf("utils.RandomPexelsWallpaperFromCache: error reading directory: %s: %s", absCacheDir, err.Error())
 	}
 
 	filesLen := len(files)
 
 	if filesLen > 0 {
-		u.Log.Infof("Getting a random photo...")
-		u.Log.Infof("Generating a random photo number...")
+		u.Log.Infof("utils.RandomPexelsWallpaperFromCache: Getting a random photo...")
+		u.Log.Infof("utils.RandomPexelsWallpaperFromCache: Generating a random photo number...")
 		randomPhotoNumber, randomPhotoNumberErr := rand.Int(rand.Reader, big.NewInt(int64(filesLen)))
 		if randomPhotoNumberErr != nil {
-			u.Log.Errorf("Error getting random number between 0 and %d", filesLen)
-			u.Log.Infof("Choosing the 1st image at position 0")
+			u.Log.Errorf("utils.RandomPexelsWallpaperFromCache: error getting random number between 0 and %d", filesLen)
+			u.Log.Infof("utils.RandomPexelsWallpaperFromCache: choosing the 1st image at position 0")
 			randomPhotoNumber = big.NewInt(0)
 		}
 
 		photoNumber := randomPhotoNumber.Int64()
-		u.Log.Infof("Getting photo number #%d...", photoNumber)
+		u.Log.Infof("utils.RandomPexelsWallpaperFromCache: getting photo number #%d...", photoNumber)
 
 		for i := photoNumber - 1; i < int64(filesLen); i++ {
+			fileName := fmt.Sprintf("%s/%s", absCacheDir, files[i].Name())
+
 			if files[i].IsDir() {
 				continue
 			}
 
-			mimeType, mimeTypeErr := u.GetFileContentType(files[i].Name())
+			mimeType, mimeTypeErr := u.GetFileContentType(fileName)
 			if mimeTypeErr != nil {
-				u.Log.Errorf("utils.RandomPexelsWallpaperFromCache: unable to get content-type for %s: %s", files[i].Name(), mimeTypeErr.Error())
+				u.Log.Errorf("utils.RandomPexelsWallpaperFromCache: unable to get content-type for %s: %s", fileName, mimeTypeErr.Error())
 				u.Log.Infof("utils.RandomPexelsWallpaperFromCache: skipping to next file...")
 				continue
 			}
 
 			if u.InArray(mimeType, []string{"image/jpeg", "image/png", "image/gif", "image/bmp", "image/tiff", "image/webp", "image/svg+xml"}) {
-				modifyWallpaperErr := u.ModifyWallpaper("gnome", files[i].Name())
+				modifyWallpaperErr := u.ModifyWallpaper("gnome", fileName)
 				if modifyWallpaperErr != nil {
-					return modifyWallpaperErr
+					return fmt.Errorf("utils.RandomPexelsWallpaperFromCache: error setting wallpaper to %s: %s", fileName, modifyWallpaperErr.Error())
 				}
+				return nil
 			}
 		}
 	}
-	return fmt.Errorf("utils.RandomPexelsWallpaperFromCache: could not find any wallpapers at %s", cacheDir)
+	return fmt.Errorf("utils.RandomPexelsWallpaperFromCache: could not find any wallpapers at %s", absCacheDir)
 }

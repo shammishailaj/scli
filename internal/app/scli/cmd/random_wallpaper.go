@@ -97,10 +97,10 @@ var randomWallpaperCmd = &cobra.Command{
 		randomWallpaperErr := u.RandomPexelsWallpaperWithCacheAndDB(authorization, query, orientation, size, color, locale, cachePath, dbFilePath)
 		if randomWallpaperErr != nil {
 			u.Log.Errorf("Error setting random wallpaper by downloading from pexels website %s\n", randomWallpaperErr.Error())
-			u.Log.Infof("Setting a random wallpaper from cache...")
+			u.Log.Infof("Setting a random wallpaper from cache at %s...", cachePath)
 			randomWallpaperFromCacheErr := u.RandomPexelsWallpaperFromCache(cachePath)
 			if randomWallpaperFromCacheErr != nil {
-				u.Log.Fatalf("scli.random.wallpaper: error setting randome wallpaper from cache. Quittng...")
+				u.Log.Fatalf("scli.random.wallpaper: error setting randome wallpaper from cache: %s", randomWallpaperFromCacheErr)
 			}
 		}
 
