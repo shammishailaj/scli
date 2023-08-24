@@ -122,16 +122,17 @@ type Genji struct {
 func (g *Genji) Connect(args ...interface{}) error {
 	// code to open a genjji DB file on filesystem
 	dbPath := args[0].(string)
-	ctx := args[0].(context.Context)
+	ctx := args[1].(context.Context)
 	if dbPath != "" {
 		g.db, g.dbConnErr = genji.Open(dbPath)
 		if g.dbConnErr != nil {
 			return g.dbConnErr
 		}
 		g.db.WithContext(ctx)
+		return nil
 	}
 
-	return errors.New(fmt.Sprintln("Invalid DB Path ", args, "Valid DB path should be a string"))
+	return errors.New(fmt.Sprintln("Invalid DB Path ", dbPath, "Valid DB path should be a string"))
 }
 
 func (g *Genji) Put(key string, value []byte) error {
