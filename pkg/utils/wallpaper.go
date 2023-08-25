@@ -518,12 +518,6 @@ func (u *Utils) RandomPexelsWallpaperWithCacheAndDB(authorization, query, orient
 
 		u.Log.Infof("Photo Found!. Saving as %s OR %s", saveFileHandle.Name(), saveFilePath)
 
-		saveMetaDataErr := photo.SaveMetaDataToGenjiDB(dbFilePath, "scli_random_wallpaper_metadata", saveFilePath, "large2x", input.Query)
-
-		if saveMetaDataErr != nil {
-			return saveMetaDataErr
-		}
-
 		if len(saveFilePath) >= 0 {
 			_, responseErr := photo.DownloadLarge2X(saveFilePath)
 			if responseErr != nil {
@@ -535,6 +529,12 @@ func (u *Utils) RandomPexelsWallpaperWithCacheAndDB(authorization, query, orient
 				return modifyWallpaperErr
 			}
 			return u.SaveWallpaperChangeLog(dbFilePath, "scli_random_wallpaper_change_log", saveFilePath, photoNumber)
+		}
+
+		saveMetaDataErr := photo.SaveMetaDataToGenjiDB(dbFilePath, "scli_random_wallpaper_metadata", saveFilePath, "large2x", input.Query)
+
+		if saveMetaDataErr != nil {
+			return fmt.Errorf("utils.RandomPexelsWallpaperWithCacheAndDB: error saving metadata for wallpaper: %s: %s", saveFilePath, saveMetaDataErr.Error())
 		}
 	}
 
@@ -579,19 +579,20 @@ func (u *Utils) SaveWallpaperChangeLog(dbPath, tableName, wallpaperPath string, 
 		PRIMARY KEY(yyyy,mm,dd,hh,ss,ms,us,ns,tz)
 		`
 
-	_, err := store.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s(%s)", tableName, tableDef))
+	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s(%s)", tableName, tableDef)
+	_, err := store.Exec(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("utils.SaveWallpaperChangeLog: error executing query: %s: %s", query, err.Error())
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s(yyyy,mm,dd,hh,mi,ss,ms,us,ns,tz,random_number,filepath) VALUES(", tableName)
+	query = fmt.Sprintf("INSERT INTO %s(yyyy,mm,dd,hh,mi,ss,ms,us,ns,tz,random_number,filepath) VALUES(", tableName)
 	query += fmt.Sprintf("%d,%d,%d,", time.Now().Year(), time.Now().Month(), time.Now().Day())
 	query += fmt.Sprintf("%d,%d,%d,", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
 	query += fmt.Sprintf("%d,%d,%d,%d", time.Now().Second(), time.Now().UnixMilli(), time.Now().UnixMicro(), time.Now().Nanosecond())
 	query += fmt.Sprintf("'%s',%d,'%s'", time.Now().Location().String(), randomNumber, wallpaperPath)
 	_, err = store.Exec(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("utils.SaveWallpaperChangeLog: error executing query: %s: %s", query, err.Error())
 	}
 
 	return nil

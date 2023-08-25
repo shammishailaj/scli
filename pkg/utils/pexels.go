@@ -337,20 +337,20 @@ func (p *Photo) SaveMetaDataToGenjiDB(dbPath, tableName, fileStoredAt, variantSa
 		query TEXT,
 		PRIMARY KEY(id,url)
 		`
-
-	_, err := store.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s(%s)", tableName, tableDef))
+	query := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s(%s)", tableName, tableDef)
+	_, err := store.Exec(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("utils.Photo.SaveMetaDataToGenjiDB: error executing query: %s: %s", query, err.Error())
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s(id, width, height, url, photographer, photographer_url, photographer_id, avg_color, src, liked, alt, file_path, saved_variant, query) VALUES(", tableName)
+	query = fmt.Sprintf("INSERT INTO %s(id, width, height, url, photographer, photographer_url, photographer_id, avg_color, src, liked, alt, file_path, saved_variant, query) VALUES(", tableName)
 	query += fmt.Sprintf("%d,%d,%d,'%s','%s', '%s', %d, '%s',", p.ID, p.Width, p.Height, p.URL, p.Photographer, p.PhotographerURL, p.PhotographerID, p.AvgColor)
 	query += fmt.Sprintf("{\"original\":'%s',\"large2x\":'%s',\"large\":'%s',\"medium\":'%s',\"small\":'%s',\"portrait\":'%s',\"landscape\":'%s',\"tiny\":'%s'}", p.Src.Original, p.Src.Large2X, p.Src.Large, p.Src.Medium, p.Src.Small, p.Src.Portrait, p.Src.Landscape, p.Src.Tiny)
 	query += fmt.Sprintf("%t,'%s', '%s','%s','%s')", p.Liked, p.Alt, fileStoredAt, variantSaved, pexelsQuery)
 
 	_, err = store.Exec(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("utils.Photo.SaveMetaDataToGenjiDB: error executing query: %s: %s", query, err.Error())
 	}
 
 	return nil
