@@ -588,7 +588,7 @@ func (u *Utils) SaveWallpaperChangeLog(dbPath, tableName, wallpaperPath string, 
 	query = fmt.Sprintf("INSERT INTO %s(yyyy,mm,dd,hh,mi,ss,ms,us,ns,tz,random_number,filepath) VALUES(", tableName)
 	query += fmt.Sprintf("%d,%d,%d,", time.Now().Year(), time.Now().Month(), time.Now().Day())
 	query += fmt.Sprintf("%d,%d,%d,", time.Now().Hour(), time.Now().Minute(), time.Now().Second())
-	query += fmt.Sprintf("%d,%d,%d,%d", time.Now().Second(), time.Now().UnixMilli(), time.Now().UnixMicro(), time.Now().Nanosecond())
+	query += fmt.Sprintf("%d,%d,%d,", time.Now().UnixMilli(), time.Now().UnixMicro(), time.Now().Nanosecond())
 	query += fmt.Sprintf("'%s',%d,'%s')", time.Now().Location().String(), randomNumber, wallpaperPath)
 	_, err = store.Exec(query)
 	if err != nil {
