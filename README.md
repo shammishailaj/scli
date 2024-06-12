@@ -53,7 +53,7 @@ The default app can be run/built using the following `make` targets.
 
 `build` - Builds the project using the `docker` image [`shammishailaj/gobuilder:0.0.6`](https://hub.docker.com/repository/docker/shammishailaj/gobuilder) first and then copies all the required project files into a `scratch` image. The resultant is a docker image and not an executable.
 
-`cli` - Builds the executable which is extracted to the `bin/` directory. cli parameters `os=&lt;os-name&gt; arch=&lt;arch-name&gt;`. The accepted values can be seen by `go tool dist list` 
+`cli` - Builds the executable which is extracted to the `bin/` directory. cli parameters `os=<os-name> arch=<arch-name>`. The accepted values can be seen by `go tool dist list` 
 
 
 #### D. Included Applications
